@@ -1,0 +1,78 @@
+
+
+
+
+<div>
+  <img [src]="profilePictureUrl" alt="Profile Picture">
+</div>
+
+<form>
+  <input type="file" (change)="onFileChange($event)">
+  <button type="submit" (click)="loadProfilePicture()">Speichern</button>
+</form>
+
+
+
+
+
+
+
+
+
+
+<div style="display: flex;">
+  <mat-card style="flex: 1 1 ;">
+    <mat-card-content>Name</mat-card-content>
+  </mat-card>
+  <mat-card style="flex: 1 1 ;">
+    <mat-card-content>{{user.pseudonym}}</mat-card-content>
+  </mat-card>
+</div>
+<div style="display: flex;">
+  <mat-card style="flex: 1 1 ;">
+    <mat-card-content>Rang</mat-card-content>
+  </mat-card>
+  <mat-card style="flex: 1 1 ;">
+    <mat-card-content>{{user.status}}</mat-card-content>
+  </mat-card>
+</div>
+<div style="display: flex;">
+  <mat-card style="flex: 1 1 ;">
+    <mat-card-content>Aktuelle Greenpunkte</mat-card-content>
+  </mat-card>
+  <mat-card style="flex: 1 1 ;">
+    <mat-card-content>{{user.points}}</mat-card-content>
+  </mat-card>
+</div>
+
+
+<div style="display: flex;">
+  <mat-card style="flex: 1 1 ;">
+    <mat-card-content>Level</mat-card-content>
+  </mat-card>
+  <mat-card style="flex: 1 1 ;">
+    <mat-card-content>{{user.level}}</mat-card-content>
+  </mat-card>
+</div>
+
+
+
+
+
+
+<mat-divider></mat-divider>
+
+
+  
+    <!--button (click)="getMethod()"  mat-raised-button color="primary">Gießen</button-->
+    <!--"http://localhost:4200/green-game/spielwiese" wenn docker container nicht verwendet wird ansonsten port 80 bei reservierungsbutton -->
+    <button (click)="addPlayer()"  mat-raised-button color="primary">Gießen</button>
+    <a mat-button href="http://localhost:80/green-game/spielwiese" target="_blank">RESERVIEREN</a>
+    
+<mat-divider></mat-divider>
+<br>
+<br>
+
+
+
+  

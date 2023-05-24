@@ -1,0 +1,73 @@
+<mat-toolbar>
+  <button type="button" aria-label="Toggle sidenav" mat-icon-button (click)="drawer.toggle()"
+    *ngIf="isHandset$ | async">
+    <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
+  </button>
+  <span>pwa-aktuell</span>
+</mat-toolbar>
+
+<mat-sidenav-container class="sidenav-container">
+  <mat-sidenav #drawer class="mat-elevation-z8"
+    [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
+    [mode]="(isHandset$ | async) ? 'over' : 'side'"
+    [opened]="(isHandset$ | async) === false">
+
+    <a mat-button href="user" class="prof-button">
+      
+     
+
+      <!--img alt="user" class="avatar mat-elevation-z8"
+      src="https://assets.bigcartel.com/product_images/289916532/MONSTERA+IN+PROCESS_updown.jpg?auto=format&fit=max&w=1200" /-->
+    <!--h4 class="name">Julian Meyer-Veit</h4-->
+    <!--p class="designation">j.meyer-veit@ostfalia.de</p-->
+    </a>
+
+
+    <mat-divider></mat-divider>
+
+    <a mat-button href="" class="menu-button">
+      <mat-icon>home</mat-icon>
+      <span>Home</span>
+    </a>
+    <a mat-button href="user" class="menu-button">
+      <mat-icon>person</mat-icon>
+      <span>Profile</span>
+    </a>
+    <a mat-button href="map" class="menu-button">
+      <mat-icon>map</mat-icon>
+      <span>Sensoren</span>
+    </a>
+    <a mat-button href="tree-science" class="menu-button">
+      <mat-icon>nature</mat-icon>
+      <span>Baumkunde</span>
+    </a>
+
+    <mat-divider></mat-divider>
+    
+    <a mat-button href="green-game" class="menu-button">
+      <mat-icon>play_arrow</mat-icon>
+      <span>Green-Game</span>
+    </a>
+
+    <mat-divider></mat-divider>
+
+    <a mat-button class="menu-button">
+      <mat-icon>help</mat-icon>
+      <span>Help</span>
+    </a>
+    <mat-divider></mat-divider>
+
+    <a mat-button (click)="logout()" class="menu-button">
+      <mat-icon>power_settings_new</mat-icon>
+      <span>Abmelden</span>
+    </a>
+
+  </mat-sidenav>
+
+  <mat-sidenav-content >
+
+    <div class="content">
+      <ng-content></ng-content>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>

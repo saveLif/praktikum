@@ -1,0 +1,13 @@
+<mat-card class="card" *ngFor="let description of alldescriptiondata">
+
+    <!--<mat-card-title-group routerLink="/card/{{description.name.german}}">-->
+    <mat-card-title-group routerLink="/card/{{description.german_name}}">
+      <img mat-card-sm-image alt="baum_icon" src="assets/img/baum_icon.png" />
+       <mat-card-title> {{description.german_name}}</mat-card-title>
+     <mat-card-subtitle>{{description.botanical_name}}</mat-card-subtitle>
+    </mat-card-title-group>
+     <!--</mat-card-title-group>-->
+    <mat-card-actions >
+      <a> </a>
+   </mat-card-actions>
+</mat-card>

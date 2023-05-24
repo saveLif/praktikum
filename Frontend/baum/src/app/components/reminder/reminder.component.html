@@ -1,0 +1,25 @@
+
+
+
+<mat-card class="example-card" *ngFor="let res of reservation">
+ 
+
+    
+
+ 
+    <mat-card>{{res.timestamp}}</mat-card>
+      <mat-card>{{res.description}}</mat-card>
+     
+  
+</mat-card> 
+  
+  
+  <mat-divider></mat-divider>
+  
+ 
+    
+  <!--"http://localhost:4200/green-game/spielwiese" wenn docker container nicht verwendet wird ansonsten port 80 bei reservierungsbutton -->     
+  <button (click)="addPlayer()"  mat-raised-button color="primary">Gießen</button>
+  <a mat-button href="http://localhost:80/green-game/spielwiese" target="_blank">RESERVIEREN</a>
+  
+  <mat-divider></mat-divider>
