@@ -1,0 +1,23 @@
+hhhh
+{{dataSource.german_name}}
+<mat-card class="card" *ngFor="let description of dataSource">
+
+    <mat-card-title-group>
+      <mat-card-title> <mat-card-subtitle>Steckbrief:</mat-card-subtitle>{{ description.german_name}}</mat-card-title>
+      <mat-card-subtitle>{{ description.botanical_name}}</mat-card-subtitle>
+      <img mat-card-sm-image alt="baum_icon" src="assets/img/baum_icon.png" />
+    </mat-card-title-group>
+    <mat-card-content>
+      <p>
+        Baumart: {{ description.origin }} <br /><br />
+        Blattform: {{ description.leaf_shape }}<br /><br />
+        Blühzeit: {{ description.flowering_time_a }},{{ description.flowering_time_b}}<br /><br />
+
+        <!--allgemeine Beschreibung: {{ description.general_description }}<br />-->
+      </p>
+    </mat-card-content>
+    <mat-card-actions>
+      <a> </a>
+    </mat-card-actions>
+
+</mat-card>

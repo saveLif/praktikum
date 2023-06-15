@@ -1,0 +1,3 @@
+include Rest-API/connection/*
+include Rest-API/JSON_Endpunkte/*
+include Rest-API/GreenGame_Endpunkte/*

@@ -1,0 +1,30 @@
+<div>
+  <form (submit)="register(registerForm)">
+    <!-- Email input field -->
+    <mat-form-field appearance="outline">
+      <mat-label>E-Mail</mat-label>
+      <input matInput type="text" [formControl]="emailFormControl" (blur)="generatePseudonym()" required>
+      <mat-error>Ungültige E-Mail Adresse</mat-error>
+    </mat-form-field>
+    <br>
+    <!-- Password input field -->
+    <mat-form-field appearance="outline">
+      <mat-label>Passwort</mat-label>
+      <input matInput type="password" [formControl]="passwordFormControl" pattern="(?=.*\d).{6,}" required>
+      <mat-error>Das Passwort muss mindestens 6 Zeichen lang sein und mindestens eine Zahl enthalten.</mat-error>
+    </mat-form-field>
+    <br>
+    <br>
+    <!-- Pseudonym input field -->
+    <mat-form-field appearance="outline">
+      <mat-label>Pseudonym</mat-label> 
+      <input matInput type="text" [formControl]="pseudonymFormControl" required>
+    </mat-form-field>
+    <br>
+    <!-- Registration button -->
+    <button mat-raised-button>Registrieren</button>
+  </form>
+</div>
+
+<!-- Message to show when user has been successfully registered -->
+<div *ngIf="msgTrue">Registrierung erfolgreich abgeschlossen</div>

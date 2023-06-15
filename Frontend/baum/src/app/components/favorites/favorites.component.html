@@ -1,0 +1,26 @@
+  <div>
+    <!-- Formulaire de connexion -->
+    <form (submit)="login(loginForm)">
+      <mat-form-field appearance="outline">
+        <mat-label>E-Mail oder pseudonym</mat-label>
+        
+        <input matInput type="text" [formControl]="loginFormControl" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" required>
+        <mat-error>Ungültige E-Mail Adresse</mat-error>
+      </mat-form-field>
+      <br>
+      <mat-form-field appearance="outline">
+        <mat-label>Passwort</mat-label>
+        <input matInput type="password" [formControl]="passwordFormControl" required>
+      </mat-form-field>
+      <br>
+      <button mat-raised-button>Anmelden</button>
+    </form>
+  </div>
+
+  <div>
+    <br>
+    <br>
+    Noch kein Konto? Dann hier registrieren:
+  </div>
+  
+  <button mat-raised-button (click)="navigiereZurRegistrierung()">Zur Registrierung</button>

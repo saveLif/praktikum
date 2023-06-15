@@ -1,0 +1,31 @@
+version: '3.8'
+services:
+
+  node:
+    image:  7951e8af158f
+    ports:
+      - "80:80"
+
+    
+  postgres:
+    build: Datenbank
+    environment:
+      POSTGRES_USER: julian1234
+      POSTGRES_PASSWORD: baum
+      POSTGRES_DB: gruenflaeche
+    ports:
+      - "5432:5432"
+
+  backend:
+    build: Backend
+    hostname: backend
+    ports:
+      - "3000:5000"
+      - "5000:5000"
+    environment:
+      PYTHONPATH: /app/Rest-API
+    command: gunicorn --bind 0.0.0.0:5000 Rest-API.api:app
+
+
+
+

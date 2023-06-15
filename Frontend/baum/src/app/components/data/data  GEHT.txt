@@ -1,0 +1,123 @@
+import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
+import { Chart } from 'chart.js';
+import 'chartjs-adapter-date-fns';
+import { Point } from 'leaflet';
+import { ApiService } from 'src/app/shared/api.service';
+import { TreeComponent } from '../tree/tree.component';
+
+@Component({
+  selector: 'app-data',
+  templateUrl: './data.component.html',
+  styleUrls: ['./data.component.scss'],
+})
+export class DataComponent implements AfterViewInit {
+  @ViewChild('chart')
+  private Canvas!: ElementRef;
+  chart: any;
+  config: any;
+  data: any;
+  treeID: any;
+
+  messure_value: any;
+  meassure_date: any = [];
+  x_data: Point[] = [];
+  y_data: any;
+  new: any;
+  a: Array<{ x: string; y: number }> = [
+    { x: '2022-07-28T09:00:00', y: 20 },
+    { x: '2022-07-28T09:01:00', y: 15 },
+  ];
+
+  // myArray: any[][] = [];
+  myArray: Array<{ label: any; da: Array<{ x: any; y: any }> }> = [];
+  myA: Array<{ x: any; y: any }> = [];
+  values: any[] = [];
+  sensoren: any;
+
+  constructor(private api: ApiService, private tree: TreeComponent) {}
+
+  public barChartOptions = {
+    scaleShowVerticalLines: false,
+    responsive: true,
+  };
+
+  ngAfterViewInit(): void {
+    this.treeID = this.tree.treeID;
+    this.pieChartBrowser();
+  }
+
+  pieChartBrowser(): void {
+    //get sensor_node_ID
+    this.api
+      .getdescription('object?ID=' + this.treeID)
+      .subscribe((sensor_node) => {
+        for (const sn of sensor_node) {
+          //get sensor_ID
+          this.api
+            .getdescription('sensor?sensor_node_ID=' + sn.sensor_node_ID)
+            .subscribe((sensor) => {
+              for (const s of sensor) {
+                //get mesured_values from sensor
+                this.sensoren = s.ID;
+                this.api
+                  .getdescription('measured_values?sensor_ID=' + s.ID)
+                  .subscribe((messure) => {
+                    for (const m of messure) {
+                      this.myA.push({ x: m.timestamp, y: m.value });
+                    }
+                    this.myArray.push({
+                      label: s.messured_variable,
+                      da: this.myA,
+                    });
+                    this.myA = [];
+
+                    //for(var i = 0; i < this.sensoren; i++){
+                    this.data = {datasets: [
+                          // {
+                          //   label: '# of Votes',
+                          //   // borderColor: 'green',
+                          //   // backgroundColor: 'black',
+                          //   // pointBackgroundColor:'black',
+                          //   // pointBorderColor: '#fff',
+                          //   // pointHoverBorderColor:'green',
+                          // },
+                          {
+                            label: this.myArray[0].label,
+                            data: this.myArray[0].da,
+                          },
+                          {
+                            label: this.myArray[1].label,
+                            data: this.myArray[1].da,
+                          },
+                        ],}
+                    this.config = {
+                      type: 'line',
+                      data: this.data,
+                      options: {
+                        scales: {
+                          x: {
+                            type: 'time',
+                            time: {
+                              unit: 'minute',
+                            },
+                            title: { text: 'Zeit', align: 'end' },
+                          },
+                          y: {
+                            beginAtZero: true,
+                            title: { text: 'Wert', align: 'end' },
+                          },
+                        },
+                      },
+                    };
+
+                    this.chart = new Chart(
+                      this.Canvas.nativeElement,
+                      this.config
+                    );
+                  });
+              }
+            });
+        }
+      });
+  }
+}

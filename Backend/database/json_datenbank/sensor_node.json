@@ -1,0 +1,14 @@
+{
+    "sensor_node": [
+        {
+          "ID": 1,
+          "description": "",
+          "installation_date": "25.07.2022"
+        },
+        {
+          "ID": 2,
+          "description": "",
+          "installation_date": "26.07.2022"
+        }
+      ]
+}
