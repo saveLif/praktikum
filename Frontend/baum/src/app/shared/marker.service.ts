@@ -27,7 +27,7 @@ export class MarkerService {
 
   ngOnInit(): void { }
 
-  makeMaker(map: L.Map, path: string) {
+  makeMarker(map: L.Map, path: string) {
     const user_id = localStorage.getItem('user_id');
     this.api.getData(`reminder/${user_id}`).subscribe(res => {
       console.log('hallo sea breaze');
@@ -219,7 +219,7 @@ export class MarkerService {
 
   ngOnInit(): void { }
 // Setzt für alle Objekte ein Marker in der Karte
-	makeMaker(map: L.Map, path: string) {
+	makeMarker(map: L.Map, path: string) {
 		const user_id = localStorage.getItem('user_id');
 		this.api.getData(`reminder/${user_id}`).subscribe(res => {
 			this.api.getData(path).subscribe((object: any) => {

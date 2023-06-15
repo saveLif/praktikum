@@ -56,7 +56,7 @@ export class MapOneComponent implements OnInit {
         //Layout wird zur Map hinzugefügt
         tiles.addTo(this.map);
         //Markerservice wird aufgerufen
-        this.markerService.makeMaker(this.map, this.path);
+        this.markerService.makeMarker(this.map, this.path);
         this.userGPS.getUserLocation(this.map);
       }
     });

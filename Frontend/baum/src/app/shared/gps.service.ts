@@ -29,7 +29,7 @@ export class GpsService {
          this.lat = position.coords.latitude;
          this.long = position.coords.longitude;
         this.showPosition(this.lat, this.long, map);
-        console.log('Was ist mit carsten los in ostanien')
+        
         console.log('lat '+this.lat+'    long '+this.long)
       },
       (err) => {

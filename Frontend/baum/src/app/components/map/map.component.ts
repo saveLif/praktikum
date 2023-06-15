@@ -73,7 +73,7 @@ export class MapComponent implements OnInit {
     CartoDB_Voyager.addTo(this.map);
 
             //Markerservice wird aufgerufen
-            this.markerService.makeMaker(this.map, 'object');
+            this.markerService.makeMarker(this.map, 'object');
             this.userGPS.getUserLocation(this.map);
   }
 }
