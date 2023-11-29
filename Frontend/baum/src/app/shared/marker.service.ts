@@ -273,9 +273,16 @@ export class MarkerService {
                     color = 'red';
                   }
                 }
+                let customIcon = L.icon({
+                  iconUrl: 'assets/tree-icon.png',
+                  iconSize: [20, 20],      // size of the icon
+                  iconAnchor: [16, 16],   // point of the icon which will correspond to marker's location
+                  popupAnchor: [0, -16], // point from which the popup should open relative to the iconAnchor
+                })
+                let markerCustom = L.marker([lat,lon], {icon:customIcon})
 
                 let circle = L.circleMarker([lat, lon], {
-                  radius: 10,
+                  radius: 5,
                 });
                 circle.setStyle({
                   fillColor: color,
@@ -288,7 +295,8 @@ export class MarkerService {
                 let popupinfo = this.popUpService.makeObjectPopup(t);
 
                 console.log(t.ID);
-                this.addCircle(map, circle, popupinfo, t.ID);
+                //this.addCircle(map, null, popupinfo, t.ID);
+                this.addIconImage(map, markerCustom, popupinfo, t.ID);
               }
             });
         }
@@ -296,10 +304,31 @@ export class MarkerService {
     });
   }
 
+  addIconImage(map: L.Map | L.MarkerClusterGroup, markerCustom: any, popUpInfo: any, ID: any) {
+    if (markerCustom !== undefined) {
+      markerCustom//marc
+        .addTo(map)
+        .bindPopup(popUpInfo)
+        .on('popupopen', (a: any) => {
+          var popUp = a.target.getPopup();
+          console.log(popUp.getElement());
+          popUp
+            .getElement()
+            .querySelector('.open-btn')
+            .addEventListener('click', (_e: any) => {
+              localStorage.setItem('object_id', ID);
+
+              console.log(ID);
+              this.router.navigate(['/tree/' + ID + '/green-game/reservierung']);
+            });
+        });
+    }
+  }
+
   // Erzeugt das Reservierungs Popup Fenster
   addCircle(map: L.Map | L.MarkerClusterGroup, circle: any, popUpInfo: any, ID: any) {
-    if (circle !== undefined) {
-      circle
+    if (circle!==null && circle !== undefined) {
+      circle//marc
         .addTo(map)
         .bindPopup(popUpInfo)
         .on('popupopen', (a: any) => {

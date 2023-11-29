@@ -1,7 +1,8 @@
+import json
 from flask import jsonify
 from db import get_connection
 from flask import request  
-
+from decimal import Decimal
 
 """Gibt Informationen zu allen Objekt zurück.
 
@@ -24,7 +25,10 @@ def get_list():
     longitude 
     FROM object INNER JOIN geolocation ON object.geolocation_id=geolocation.id"""
 
-    
+    num = Decimal('3.20')
+    json_str2 = json.dumps({'gehalt': num}, default=str)
+    print(json_str2)
+
     conn = get_connection()
     try:
         with conn:
@@ -34,7 +38,11 @@ def get_list():
     finally:
         conn.close()
 
-    
+
+    num = Decimal('3.14')
+    json_str = json.dumps({'salary': num}, default=str)
+    print(json_str)
+
     objects = []
     for row in rows:
         objects.append({
@@ -142,8 +150,8 @@ def get_object():
             "description": row[1],
             "description_ID": row[2],
             "geolocation": {
-                "latitude": row[3],
-                "longitude": row[4]
+                "latitude": str(row[3]),
+                "longitude": str(row[4])
             }
         })
 

@@ -17,7 +17,7 @@ services:
       - "5432:5432"
 
   backend:
-    build: Backend
+    image: praktikum-backend:latest
     hostname: backend
     ports:
       - "3000:5000"
