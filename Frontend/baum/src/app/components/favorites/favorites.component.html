@@ -2,7 +2,7 @@
     <!-- Formulaire de connexion -->
     <form (submit)="login(loginForm)">
       <mat-form-field appearance="outline">
-        <mat-label>E-Mail oder pseudonym</mat-label>
+        <mat-label>E-Mail oder Pseudonym</mat-label>
         
         <input matInput type="text" [formControl]="loginFormControl" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" required>
         <mat-error>Ungültige E-Mail Adresse</mat-error>
@@ -13,7 +13,7 @@
         <input matInput type="password" [formControl]="passwordFormControl" required>
       </mat-form-field>
       <br>
-      <button mat-raised-button>Anmelden</button>
+      <button mat-raised-button>anmelden</button>
     </form>
   </div>
 
