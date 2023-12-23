@@ -155,9 +155,7 @@ export class MapComponent implements OnInit {
     });
 
     this.map.addLayer(this.markers);
-
     this.markerService.makeMarker(this.markers, 'object');
-
     this.userGPS.getUserLocation(this.map);
   }
 }
