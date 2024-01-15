@@ -20,141 +20,198 @@ postgres_conn = psycopg2.connect(
     host='localhost',
     port='5432'
 )
+column_ind = dict()
+
+
+columns = ["id","PITID","KST","ANLAG_OBJN","AKTENZEICH","STANDORT_N","KENNZEICHE","NAME_NUMBE","NAME_BEZIR","NAME","GEFAELLT","LAUFENDE_N","ART_BOTANI","ART_DEUTSC","STAMMUMFAN","KRONNENDUR","BAUMHOEHE","ZUSATZ","ERSTERFASS","REGEL_KONT","EAST","NORTH","FAELLDATUM","NAME_D","MESS_ART","MESS_DATUM","VITALITAET","longitude","latitude"]
+for index, column_name in enumerate(columns)  : 
+    column_ind[column_name] = index
 
 postgres_cursor = postgres_conn.cursor()
 
-postgres_cursor.execute("""CREATE TABLE IF NOT EXISTS 
-geolocation(objectid integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY, latitude numeric NOT NULL, longitude numeric NOT NULL)""")
-
+# Abrufen von Daten aus der Tabelle "tree" in SQLite
+sqlite_cursor.execute("""SELECT * FROM tree""")
 rows = sqlite_cursor.fetchall()
+
+
+#################################################################################geolocation
+postgres_cursor.execute("""CREATE TABLE IF NOT EXISTS geolocation(
+    id INT PRIMARY KEY,
+    latitude NUMERIC NOT NULL,
+    longitude NUMERIC NOT NULL
+)""")
+
 for row in rows:
-    lat, lon = row 
-    postgres_cursor.execute("""INSERT INTO geolocation(latitude, longitude) VALUES (%s, %s)""",(lat, lon))
+    id = row[column_ind['id']]
+    lat = row[column_ind['latitude']]
+    lon = row[column_ind['longitude']]
 
-postgres_cursor.execute("CREATE TABLE IF NOT EXISTS name(objectid integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY, german text NOT NULL, botanical text NOT NULL)")
+    postgres_cursor.execute("""INSERT INTO geolocation(id, latitude, longitude)
+        VALUES (%s, %s, %s)""", (id, lat, lon))
+postgres_conn.commit()
 
 
-for i in range(92363):
-    # Generate fake data
-    german_name = "Fake German Name " + str(i)
-    botanical_name = "Fake Botanical Name " + str(i)
+#########################################################################################name
+postgres_cursor.execute("CREATE TABLE IF NOT EXISTS name(id integer PRIMARY KEY, german text NOT NULL, botanical text NOT NULL)")
+
+for row in rows:
+    german = row[column_ind['ART_DEUTSC']]
+    botanical = row[column_ind['ART_BOTANI']]
+    id = row[column_ind['id']]
 
     # Insert data into table
     postgres_cursor.execute(
-        """INSERT INTO name(german, botanical) VALUES (%s, %s)""",
-        (german_name, botanical_name)
+        """INSERT INTO name(id, german, botanical) VALUES (%s, %s, %s)""",
+        (id, german, botanical)
     )
+postgres_conn.commit()
 
-postgres_cursor.execute("""CREATE TABLE IF NOT EXISTS description(objectid integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY, 
-name_id integer NOT NULL REFERENCES name(objectid), origin text NOT NULL, leaf_shape text NOT NULL,
+
+################################################################################description
+postgres_cursor.execute("""CREATE TABLE IF NOT EXISTS description(
+id integer PRIMARY KEY, 
+name_id integer NOT NULL REFERENCES name(id), 
+origin text NOT NULL, 
+leaf_shape text NOT NULL,
 general_description text NOT NULL)""")
-for i in range(92363):
-    # Generate fake data
-    name_id = i+1
-    origin = "Fake orgin " + str(i)
-    leaf_shape = "Fake leaf_shape" + str(i)
-    general_description = "Fake general_description" +  str(i)
 
-
+for row in rows:
+    id = row[column_ind['id']]
+    origin = row[column_ind['PITID']] or "default origin"
+    leaf_shape = row[column_ind['NAME']] or "default leaf_shape"
+    general_description = row[column_ind['NAME_NUMBE']]
 
     # Insert data into table
     postgres_cursor.execute(
-        """INSERT INTO description(name_id, origin, leaf_shape, general_description) VALUES (%s, %s, %s, %s)""",
-        (name_id, origin, leaf_shape, general_description )
+        """INSERT INTO description(id, name_id, origin, leaf_shape, general_description) VALUES (%s,%s, %s, %s, %s)""",
+        (id, id, origin, leaf_shape, general_description )
     )
+postgres_conn.commit()
 
-postgres_cursor.execute("""CREATE TABLE IF NOT EXISTS flowering_time(month smallint NOT NULL,
- description_id integer NOT NULL REFERENCES description(objectid))""")
 
-for i in range(92363):
+############################################################################flowering_time
+postgres_cursor.execute("""CREATE TABLE IF NOT EXISTS flowering_time(
+month smallint NOT NULL,
+description_id integer NOT NULL REFERENCES description(id))""")
+
+for row in rows:
+    id = row[column_ind['id']]
     month1 = random.randint(1, 12)
     month2 = random.randint(1, 12)
-    description_id = i + 1
-    postgres_cursor.execute("INSERT INTO flowering_time(month, description_id) VALUES (%s, %s)", (month1, description_id))
-    postgres_cursor.execute("INSERT INTO flowering_time(month, description_id) VALUES (%s, %s)", (month2, description_id))
+    postgres_cursor.execute(
+        """INSERT INTO flowering_time(month, description_id) VALUES (%s,%s)""",
+        (month1, id)
+    )
 
+    postgres_cursor.execute(
+        """INSERT INTO flowering_time(month, description_id) VALUES (%s,%s)""",
+        (month2, id)
+    )
+postgres_conn.commit()    
+
+
+###################################################################################object
 postgres_cursor.execute("""CREATE TABLE IF NOT EXISTS object(
-    objectid integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    id integer PRIMARY KEY,
     description text NOT NULL,
-    geolocation_id integer NOT NULL REFERENCES geolocation(objectid),
-    description_id integer NOT NULL REFERENCES description(objectid)
+    geolocation_id integer NOT NULL REFERENCES geolocation(id),
+    description_id integer NOT NULL REFERENCES description(id)
 )""")
-sqlite_cursor.execute("""SELECT NAME_NUMBE FROM tree""")
-rows = sqlite_cursor.fetchall()
-i = 0
+
 for row in rows:
-    i= i+1
-    description = row[0]
-    
-    # Generate fake data
-    geolocation_id = i
-    description_id = i
+    id = row[column_ind['id']]
+    description = row[column_ind['NAME_NUMBE']]
+    postgres_cursor.execute(
+        """INSERT INTO object(id, description, geolocation_id, description_id) VALUES (%s,%s,%s,%s)""",
+        (id, description, id, id)
+    )
+postgres_conn.commit() 
 
-    postgres_cursor.execute("""INSERT INTO object(description, geolocation_id,
-    description_id) VALUES (%s, %s, %s)""", (description, geolocation_id, description_id)) 
 
-postgres_cursor.execute("""CREATE TABLE IF NOT EXISTS location(objectid integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-geolocation_id integer NOT NULL REFERENCES geolocation(objectid), height integer NOT NULL)""")
-for i in range(92363):
-    geolocation_id = i+1
-   
-    height = random.randint(10, 90)
-    postgres_cursor.execute("""INSERT INTO location(geolocation_id , height)
-    VALUES (%s, %s)""", (geolocation_id, height))
+###################################################################################lo0cation
+postgres_cursor.execute("""CREATE TABLE IF NOT EXISTS location(
+    id integer PRIMARY KEY,
+    geolocation_id integer NOT NULL REFERENCES geolocation(id), 
+    height integer NOT NULL
+)""")
 
-postgres_cursor.execute("""CREATE TABLE IF NOT EXISTS sensor(objectid integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY, 
-measured_variable text NOT NULL CHECK (measured_variable IN ('humidity', 'temperature', 'light')), 
-installation_date date NOT NULL,
-location_id INTEGER NOT NULL REFERENCES location(objectid))""")
+for row in rows:
+    id = row[column_ind['id']]
+    height = row[column_ind['BAUMHOEHE']]
+    postgres_cursor.execute(
+        """INSERT INTO location(id, geolocation_id, height) VALUES (%s,%s,%s)""",
+        (id, id, height)
+    )
+postgres_conn.commit()  
 
-for i in range(92363):
+
+###################################################################################sensor
+postgres_cursor.execute("""CREATE TABLE IF NOT EXISTS sensor(
+    id integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY, 
+    measured_variable text NOT NULL CHECK (measured_variable IN ('humidity', 'temperature', 'light')), 
+    installation_date date NOT NULL,
+    location_id INTEGER NOT NULL REFERENCES location(id)
+)""")
+
+for row in rows:
+    id = row[column_ind['id']]
     measured_variable = 'humidity'
     installation_date = '2023-01-14'
-    location_id = i+1
 
     postgres_cursor.execute("""INSERT INTO sensor(measured_variable,installation_date ,location_id)
-    VALUES (%s, %s ,%s)""", (measured_variable, installation_date ,location_id))
+    VALUES (%s, %s ,%s)""", (measured_variable, installation_date ,id))
+postgres_conn.commit() 
 
 
-postgres_cursor.execute("""CREATE TABLE IF NOT EXISTS located(object_id integer NOT NULL REFERENCES object(objectid),
-sensor_id integer NOT NULL REFERENCES sensor(objectid))""")
+# ####################################################################################located
+postgres_cursor.execute("""CREATE TABLE IF NOT EXISTS located(
+    object_id integer NOT NULL REFERENCES object(id),
+    sensor_id integer NOT NULL REFERENCES sensor(id)
+)""")
 
-for i in range(92363):
-    object_id = i+1
-    sensor_id = i+1
+for row in rows:
+    id = row[column_ind['id']]
     postgres_cursor.execute("""INSERT INTO located(object_id, sensor_id)
-    VALUES (%s, %s)""", (object_id, sensor_id))
+    VALUES (%s, %s)""", (id, id))
+postgres_conn.commit() 
 
-postgres_cursor.execute("""CREATE TABLE IF NOT EXISTS measured_values(objectid integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-value integer NOT NULL, timestamp timestamp NOT NULL, sensor_id integer NOT NULL REFERENCES sensor(objectid))""")
-for i in range(92363):
+
+###############################################################################measured_values   
+postgres_cursor.execute("""CREATE TABLE IF NOT EXISTS measured_values(
+    id integer PRIMARY KEY,
+    value integer NOT NULL, 
+    timestamp timestamp NOT NULL, 
+    sensor_id integer NOT NULL REFERENCES sensor(id)
+    )""")
+
+for row in rows:
+    id = row[column_ind['id']]
     value = random.randint(20, 95)
     timestamp = '2023-01-13'
-    sensor_id = i+1
-
-    postgres_cursor.execute("""INSERT INTO measured_values(value, timestamp, sensor_id)
-    VALUES (%s, %s, %s)""", (value, timestamp, sensor_id))
-
+    postgres_cursor.execute("""INSERT INTO measured_values(id, value, timestamp, sensor_id)
+    VALUES (%s, %s, %s, %s)""", (id, value, timestamp, id))
+postgres_conn.commit()
 
 
-
-
-
+###########################################################################################tree
 postgres_cursor.execute("""CREATE TABLE IF NOT EXISTS tree(
-    object_id int NOT NULL REFERENCES object(objectid),
+    object_id int NOT NULL REFERENCES object(id),
     points int NOT NULL,
     timestamp timestamp NOT NULL
     )""")
 
-for i in range(92363):
-    object_id = i+1 
+for row in rows:
+    id = row[column_ind['id']] 
     points = 20  
     timestamp = '2023-01-14'
     postgres_cursor.execute("""INSERT INTO tree(object_id, points, timestamp)
-    VALUES (%s, %s, %s)""", (object_id, points, timestamp))
+    VALUES (%s, %s, %s)""", (id, points, timestamp))
+postgres_conn.commit()
+    
 
+######################################################################################userprofil
 postgres_cursor.execute("""CREATE TABLE IF NOT EXISTS userprofil (
-        objectid integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+        id integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
         email text NOT NULL,
         password text NOT NULL,
         pseudonym text NOT NULL,
@@ -164,26 +221,30 @@ postgres_cursor.execute("""CREATE TABLE IF NOT EXISTS userprofil (
         points INTEGER NOT NULL DEFAULT 0,
         CHECK (status IN ('User', 'Dienstleister', 'Admin'))
     )""")
-for i in range(92363):
+for i in range(20):
     email = ''.join(random.choices(string.ascii_letters, k=10)) + '@example.com'
     password = ''.join(random.choices(string.ascii_letters + string.digits, k=10))
     pseudonym = ''.join(random.choices(string.ascii_letters, k=10))
     postgres_cursor.execute("""INSERT INTO userprofil(email, password, pseudonym)
     VALUES (%s, %s, %s)""", (email, password, pseudonym))
 
+
+#########################################################################################game
 postgres_cursor.execute("""CREATE TABLE IF NOT EXISTS game(
-        objectid int NOT NULL REFERENCES userprofil(objectid),
+        id int NOT NULL REFERENCES userprofil(id),
         points int NOT NULL,
         timestamp timestamp NOT NULL
     )""")
+postgres_conn.commit()
 
+
+##################################################################################reservation
 postgres_cursor.execute("""CREATE TABLE IF NOT EXISTS reservation(
-    user_id int NOT NULL REFERENCES userprofil(objectid),    
-    object_id int NOT NULL REFERENCES object(objectid),
+    user_id int NOT NULL REFERENCES userprofil(id),    
+    object_id int NOT NULL REFERENCES object(id),
     timestamp timestamp with time zone NOT NULL
     )""")
-
 postgres_conn.commit()
+
 postgres_cursor.close()
 postgres_conn.close()
-
