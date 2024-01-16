@@ -246,5 +246,28 @@ postgres_cursor.execute("""CREATE TABLE IF NOT EXISTS reservation(
     )""")
 postgres_conn.commit()
 
+
+###############################################################################################################
+# Ensuite, ajoutez le contenu du fichier SQL généré pour le schéma
+with open("C:\\telegraf\\output.sql", "r") as schema_file:
+    schema_content = schema_file.read()
+
+# Enregistrez le script SQL complet (schéma + données) dans un nouveau fichier
+with open("C:\\telegraf\\complete_script.sql", "w") as complete_script:
+    complete_script.write(schema_content)
+
+    # Ajoutez les instructions INSERT INTO pour chaque table
+    for table_name in ["geolocation", "name", "description", "flowering_time", "object", "location", "sensor", "located", "measured_values", "tree", "userprofil", "game", "reservation"]:
+        complete_script.write(f"\n\n-- Data for {table_name} table\n")
+        postgres_cursor.execute(f"SELECT * FROM {table_name}")
+        rows = postgres_cursor.fetchall()
+
+        for row in rows:
+            values = ", ".join(map(str, row))
+            complete_script.write(f"INSERT INTO {table_name} VALUES ({values});\n")
+
+# Assurez-vous de commiter les transactions après la lecture des données
+postgres_conn.commit()
+
 postgres_cursor.close()
 postgres_conn.close()
