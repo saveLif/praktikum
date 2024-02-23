@@ -205,6 +205,7 @@ import { PopUpService } from './popup.service';
 import { ApiService } from '../shared/api.service';
 import { Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -304,6 +305,15 @@ export class MarkerService {
     });
   }
 
+
+
+
+
+
+
+
+
+
   addIconImage(map: L.Map | L.MarkerClusterGroup, markerCustom: any, popUpInfo: any, ID: any) {
     if (markerCustom !== undefined) {
       markerCustom//marc
@@ -347,5 +357,3 @@ export class MarkerService {
     }
   }
 }
-
-
