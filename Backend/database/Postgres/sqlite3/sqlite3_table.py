@@ -30,7 +30,7 @@ for index, column_name in enumerate(columns)  :
 postgres_cursor = postgres_conn.cursor()
 
 # Abrufen von Daten aus der Tabelle "tree" in SQLite
-sqlite_cursor.execute("""SELECT * FROM tree""")
+sqlite_cursor.execute("""SELECT * FROM tree ORDER BY id ASC""")
 rows = sqlite_cursor.fetchall()
 
 

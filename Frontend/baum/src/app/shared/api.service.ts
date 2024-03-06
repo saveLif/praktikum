@@ -15,9 +15,15 @@ export class ApiService {
 
   //Abfrage des Servers mit einem bestimmten Pfad
 
+  getGeoData(pfad: any, page: number , limit: number) {
+    return this._http
+      .get<any>(`http://localhost:5000/${pfad}?page=${page}&limit=${limit}`)
+      .pipe(catchError(this.handleError<any[]>('getData', [])));
+  }
+
   getData(pfad: any) {
     return this._http
-      .get<any>('http://localhost:5000/' + pfad)
+      .get<any>(`http://localhost:5000/${pfad}`)
       .pipe(catchError(this.handleError<any[]>('getData', [])));
   }
 

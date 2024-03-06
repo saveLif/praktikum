@@ -123,14 +123,14 @@ geolocation:
 
 """ 
 
-def get_object():
+def get_object(pageNumber = 0, lim = 500):
     
 
+     
 
-
-
-    
-    sql_select = """SELECT object.id, description, description_id, latitude, longitude FROM object INNER JOIN geolocation ON object.geolocation_id=geolocation.id"""
+    startline = int(pageNumber) * int(lim);
+    sql_select = """SELECT obj.id, obj.description, obj.description_id, geo.latitude, geo.longitude FROM object obj INNER JOIN geolocation geo ON obj.geolocation_id=geo.id WHERE 
+    obj.id > """ + str(startline) + """ ORDER BY obj.id ASC limit """ + str(lim);
 
     
     conn = get_connection()
