@@ -123,7 +123,7 @@ geolocation:
 
 """ 
 
-def get_object(pageNumber = 0, lim = 500):
+def get_object(pageNumber = 0, lim = 10):
     
 
      
