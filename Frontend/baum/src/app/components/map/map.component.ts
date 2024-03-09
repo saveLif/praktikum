@@ -3,6 +3,7 @@ import * as L from 'leaflet';
 import { MarkerService } from '../../shared/marker.service';
 import { GpsService } from '../../shared/gps.service';
 import 'leaflet.markercluster';
+import { ApiService } from 'src/app/shared/api.service';
 
 const iconRetinaUrl = 'assets/marker-icon-2x.png';
 const iconUrl = 'assets/marker-icon.png';
@@ -30,6 +31,7 @@ export class MapComponent implements OnInit {
 
   constructor(
     private markerService: MarkerService,
+    private api: ApiService,
     private userGPS: GpsService
   ) {}
 
@@ -81,7 +83,21 @@ export class MapComponent implements OnInit {
     });
 
     this.map.addLayer(this.markers);
-    this.markerService.makeMarker(this.markers, 'object');
+    
+    let page = 0; 
+    let limit = 1000;
+
+    do {
+      this.api.getGeoData('object', page, limit).subscribe((object: any) => {
+        for (const t of object) {
+          console.log(t.ID + "    in map Component")
+          this.markerService.makeMarkers(this.markers, 'object', t);
+        }
+
+      });
+      page = page + 1;
+    } while(page *limit < 92000); 
+
     this.userGPS.getUserLocation(this.map);
   }
 }

@@ -12,6 +12,7 @@ import { GpsService } from '../../shared/gps.service'
   templateUrl: './map-one.component.html',
   styleUrls: ['./map-one.component.scss'],
 })
+
 export class MapOneComponent implements OnInit {
   private map!: L.Map;
   treeID: any;
@@ -35,9 +36,11 @@ export class MapOneComponent implements OnInit {
 
   //Initialisiert die Map
   private initMap(): void {
-    //ruft das Darszustellende Object ab
-    this.api.getData(this.path).subscribe((object: any) => {
+    //ruft das Darszustellende Object ab    
+    
+      this.api.getData(this.path).subscribe((object: any) => {
       for (const t of object) {
+        console.log(t.ID + "    in map -one")
         //Koordinaten und Zoomstufe werden definiert
         this.map = L.map('map', {
           center: [t.geolocation.latitude, t.geolocation.longitude],
@@ -53,12 +56,15 @@ export class MapOneComponent implements OnInit {
               '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
           }
         );
+
+
         //Layout wird zur Map hinzugefügt
         tiles.addTo(this.map);
         //Markerservice wird aufgerufen
-        this.markerService.makeMarker(this.map, this.path);
+        this.markerService.makeMarkers(this.map, this.path, t);
         this.userGPS.getUserLocation(this.map);
       }
     });
+   
   }
 }
