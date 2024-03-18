@@ -3,6 +3,7 @@ import * as L from 'leaflet';
 import { MarkerService } from '../../shared/marker.service';
 import { GpsService } from '../../shared/gps.service';
 import 'leaflet.markercluster';
+import { ApiService } from 'src/app/shared/api.service';
 
 const iconRetinaUrl = 'assets/marker-icon-2x.png';
 const iconUrl = 'assets/marker-icon.png';
@@ -30,6 +31,7 @@ export class MapComponent implements OnInit {
 
   constructor(
     private markerService: MarkerService,
+    private api: ApiService,
     private userGPS: GpsService
   ) {}
 

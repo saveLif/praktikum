@@ -2,7 +2,8 @@ version: "3.8"
 
 services:
   node:
-    image: d723c6b91326
+    build: Frontend/baum
+    container_name: node
     ports:
       - "80:80"
 
