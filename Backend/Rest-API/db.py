@@ -11,6 +11,7 @@ Die Methode gibt eine connection zurück.
 """ 
 
 def get_connection():
+    print("in geconnection")
     return psycopg2.connect(
 	database="gruenflaeche",
 	user="julian1234",

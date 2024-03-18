@@ -106,6 +106,11 @@ def get_object():
     from object import get_object
     return get_object(args.get("page", default=0), args.get("limit", default=500))
 
+@app.route('/cluster', methods = ['GET'])
+def get_Map():
+    from cluster import get_Map
+    return get_Map()
+
 @app.route('/objects', methods = ['GET'])
 def get_object_id():
     from object import get_object_id

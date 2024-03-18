@@ -21,6 +21,12 @@ export class ApiService {
       .pipe(catchError(this.handleError<any[]>('getData', [])));
   }
 
+  getMapData(pfad: any) {
+    return this._http
+    .get<any>(`http://localhost:5000/${pfad}`)
+    .pipe(catchError(this.handleError<any[]>('getData', [])));
+  }
+
   getData(pfad: any) {
     return this._http
       .get<any>(`http://localhost:5000/${pfad}`)

@@ -3,6 +3,8 @@ from flask import jsonify
 from db import get_connection
 from flask import request  
 from decimal import Decimal
+from flask import  Flask, send_file, jsonify
+from flask_cors import CORS
 
 """Gibt Informationen zu allen Objekt zurück.
 
@@ -16,7 +18,10 @@ geolocation:
     latitude: Breitengrad des Objektes
     longitude: Längengrad des Objektes
 
+    
 """ 
+app = Flask(__name__)
+CORS(app)
 def get_list():
     
     sql_select = """SELECT object.id,
@@ -156,6 +161,8 @@ def get_object(pageNumber = 0, lim = 10):
         })
 
     return jsonify(objects)
+if __name__ == '__main__':
+    get_object()
 
 
 

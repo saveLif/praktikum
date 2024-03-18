@@ -23,17 +23,17 @@ postgres_cursor = postgres_conn.cursor()
 
 # Erstellen der Tabelle geolocation in PostgreSQL
 postgres_cursor.execute("""CREATE TABLE IF NOT EXISTS geolocation(
-    OBJECTID SERIAL PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     latitude numeric NOT NULL,
     longitude numeric NOT NULL
 )""")
 
 # Abrufen von Daten aus der Tabelle "tree" in SQLite
-sqlite_cursor.execute("""SELECT OBJECTID, latitude, longitude FROM tree""")
+sqlite_cursor.execute("""SELECT id, latitude, longitude FROM tree""")
 rows = sqlite_cursor.fetchall()
 
 for row in rows:
-    tree_OBJECTID, lat, lon = row
+    tree_id, lat, lon = row
     postgres_cursor.execute("""INSERT INTO geolocation(latitude, longitude)
         OVERRIDING SYSTEM VALUE
         VALUES (%s, %s)""", (lat, lon))
