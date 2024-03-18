@@ -4,6 +4,7 @@ import { MarkerService } from '../../shared/marker.service';
 import { GpsService } from '../../shared/gps.service';
 import 'leaflet.markercluster';
 import { ApiService } from 'src/app/shared/api.service';
+import { Point } from 'leaflet';
 
 const iconRetinaUrl = 'assets/marker-icon-2x.png';
 const iconUrl = 'assets/marker-icon.png';
@@ -68,8 +69,33 @@ export class MapComponent implements OnInit {
 
     CartoDB_Voyager.addTo(this.map);
 
+    let progress = document.getElementById('progress');
+		let progressBar = document.getElementById('progress-bar');
 
-    this.markers = L.markerClusterGroup({
+    function updateProgressBar(processed: any, total: any, elapsed: any) {
+			if (elapsed > 1000) {
+				// if it takes more than a second to load, display the progress bar:
+        if (progress != null && progressBar != null){
+          console.log(  +  "   into updateProgressBar 1 ")
+				  progress.style.display = 'block';
+				  progressBar.style.width = Math.round(processed/total*100) + '%';
+        }
+			}
+
+			if (processed === total) {
+				// all markers processed - hide the progress bar:
+        if (progress != null)
+        {
+          console.log(  +  "   into updateProgressBar 2 ")
+          progress.style.display = 'none';
+        }
+			
+			}
+		}
+    this.markers = L.markerClusterGroup(
+      { chunkedLoading: true,
+        chunkProgress: updateProgressBar ,
+
       iconCreateFunction: (cluster) => {
         const count = cluster.getChildCount();
         const treeIconUrl = 'assets/arbre-icon.png';
@@ -80,10 +106,17 @@ export class MapComponent implements OnInit {
           iconSize: [20, 20]
         });
       },
-    });
+      }
+      
+      );
+
+    console.log('start creating markers: ' + window.performance.now());
+    this.markerService.makeMarker(this.markers, 'object');
+    console.log('end creating markers: ' + window.performance.now());
 
     this.map.addLayer(this.markers);
-    this.markerService.makeMarker(this.markers, 'object');
+    console.log('end clustering: ' + window.performance.now());
+    
     this.userGPS.getUserLocation(this.map);
   }
 }
