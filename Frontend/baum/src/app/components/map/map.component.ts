@@ -30,6 +30,7 @@ export class MapComponent implements OnInit {
   private map!: L.Map;
   private markers!: L.MarkerClusterGroup;
 
+  public totalPages = 0;
   public pageNumber = 0;
   private limit = 10000;
   private objects: any[] = [];
@@ -45,8 +46,48 @@ export class MapComponent implements OnInit {
     console.log("start init map");
     this.initMap();
     this.loadAllObjects();
-    
   }
+  
+  loadObjectForPage(pageNumber: number) {
+    const startindex = pageNumber * this.limit;
+    const endindex = (pageNumber + 1) * this.limit;
+    const objectsToMark = this.allObjects.slice(startindex, endindex);
+  
+    console.log(" in loadObjectForPage " + objectsToMark.length);
+    console.log(" in loadObjectForPage " + startindex);
+    if (objectsToMark.length > 0){
+      console.log(" in loadObjectForPage " + objectsToMark.length);
+      this.makeMarkerToObjects(objectsToMark);
+    }
+  }
+  
+  nextPage(): void {
+    const totalPages = Math.ceil(this.allObjects.length / this.limit);
+  
+    if (this.pageNumber < totalPages - 1) {
+      console.log(" next page number: " + this.pageNumber);
+      this.pageNumber++;
+      this.loadObjectForPage(this.pageNumber);
+    }
+  }
+  
+  prevPage(): void {
+    console.log("start previous  ");
+    if (this.pageNumber >= 1) {
+      console.log("actual page  "  +  this.pageNumber);
+      this.pageNumber--;
+      this.loadObjectForPage(this.pageNumber);
+      console.log("Previous page: "  + this.pageNumber);
+    }
+  }
+  
+  goToPage(pageNumber: number): void {
+    if (pageNumber >= 1 && pageNumber <= this.totalPages) {
+      this.pageNumber = pageNumber - 1; // Adjust for 0-based index
+      this.loadObjectForPage(this.pageNumber);
+    }
+  }
+  
 
   // Loads the objects from table geolocation.
   loadAllObjects(): void{
@@ -54,51 +95,22 @@ export class MapComponent implements OnInit {
     this.api.getData(`reminder/${user_id}`).subscribe((res) => {
       this.api.getData('object').subscribe((object: any) => {
         this.allObjects = object;
+        this.totalPages = Math.ceil(this.allObjects.length / this.limit);
+        this.loadObjectForPage(0);
         console.log("after call " + this.allObjects.length);
         console.log("after call " + object.length);
       });
     });
   }
 
-  loadObjectForPage(startindex: number) {
-    let objectPar: any[] = this.allObjects.slice(startindex, startindex + this.limit);
 
-    console.log(" in loadObjectForPage " + objectPar.length);
-    console.log(" in loadObjectForPage " + startindex);
-    if (objectPar != null){
-      console.log(" in loadObjectForPage " + objectPar.length);
-      this.makeMarkerToObjects(objectPar);
-    }
-  }
 
-  nextPage(): void {
-  const totalPages = Math.ceil(this.allObjects.length / this.limit);
 
- if (this.pageNumber < totalPages - 1) {
-   console.log(" next page number " +   this.pageNumber);
-    this.loadObjectForPage(this.pageNumber * this.limit);
-    this.pageNumber++;
- }
-}
+    
 
-  prevPage(): void {
-    console.log("start previous  ");
-    if (this.pageNumber >= 1) {
-      console.log("actual page  " +  this.pageNumber--);
-      this.pageNumber--;
-      this.loadObjectForPage(this.pageNumber * this.limit);
-      console.log("Previous page    "  + this.pageNumber);
-    }
-  }
-
-  // goToPage(pageNumber: number): void {
-  //   if (pageNumber >= 1 && pageNumber <= this.totalPages) {
-  //     this.currentPage = pageNumber;
-  //     this.loadObjects();
-  //   }
 
   getPageNumbers(): number[] {
-    return Array.from({ length: 10 }, (_, i) => i + 1);
+    return Array.from({ length: this.totalPages }, (_, i) => i + 1);
   }
 
   private initMap(): void {
@@ -131,32 +143,27 @@ export class MapComponent implements OnInit {
     CartoDB_Voyager.addTo(this.map);
 
     let progress = document.getElementById('progress');
-		let progressBar = document.getElementById('progress-bar');
+    let progressBar = document.getElementById('progress-bar');
 
     function updateProgressBar(processed: any, total: any, elapsed: any) {
-			if (elapsed > 1000) {
-
+      if (elapsed > 1000) {
         if (progress != null && progressBar != null){
-          console.log(  +  "   into updateProgressBar 1 ")
-				  progress.style.display = 'block';
-				  progressBar.style.width = Math.round(processed/total*100) + '%';
+          console.log("   into updateProgressBar 1 ")
+          progress.style.display = 'block';
+          progressBar.style.width = Math.round(processed/total*100) + '%';
         }
-			}
+      }
 
-			if (processed === total) {
-
-        if (progress != null)
-        {
-          console.log(  +  "   into updateProgressBar 2 ")
+      if (processed === total) {
+        if (progress != null) {
+          console.log("   into updateProgressBar 2 ")
           progress.style.display = 'none';
         }
-			
-			}
-		}
-    this.markers = L.markerClusterGroup(
-      { chunkedLoading: true,
-        chunkProgress: updateProgressBar ,
-
+      }
+    }
+    this.markers = L.markerClusterGroup({
+      chunkedLoading: true,
+      chunkProgress: updateProgressBar,
       iconCreateFunction: (cluster) => {
         const count = cluster.getChildCount();
         const treeIconUrl = 'assets/arbre-icon.png';
@@ -166,15 +173,11 @@ export class MapComponent implements OnInit {
           className: 'custom-cluster-icon',
           iconSize: [20, 20]
         });
-      },
       }
-    );  
-
+    });  
   }
 
-   private makeMarkerToObjects(objectsToMark: any[]){
-
-   
+  private makeMarkerToObjects(objectsToMark: any[]){
     console.log('start creating markers: ' + window.performance.now());
     this.markerService.makeMarkers(this.markers, objectsToMark);
     console.log('end creating markers: ' + window.performance.now());

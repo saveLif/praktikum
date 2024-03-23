@@ -37,8 +37,8 @@
 
 <div class="pagination">
   <button (click)="prevPage()" [disabled]="pageNumber === 0">Zurück</button>
-  <!-- <button *ngFor="let pageNum of getPageNumbers()" (click)="goToPage(pageNumber)">{{ pageNumber }}</button> -->
-  <button (click)="nextPage()">Nächtste</button>
+  <button *ngFor="let pageNumber of getPageNumbers()" (click)="goToPage(pageNumber)">{{ pageNumber }}</button>
+  <button (click)="nextPage()">Nächtst</button>
 </div>
 
 </body>

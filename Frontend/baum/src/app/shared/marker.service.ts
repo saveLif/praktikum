@@ -63,15 +63,15 @@ export class MarkerService {
           let lon = t.geolocation.longitude;
           let lat = t.geolocation.latitude;
           let customIcon = L.icon({
-            iconUrl: 'assets/tree-icon.png',
+            iconUrl: 'assets/arbre-icon.png',
             iconSize: [20, 20],      // size of the icon
-            iconAnchor: [16, 16],   // point of the icon which will correspond to marker's location
-            popupAnchor: [0, -16], // point from which the popup should open relative to the iconAnchor
+            iconAnchor: [16, 16],    // point of the icon which will correspond to marker's location
+            popupAnchor: [0, -16],   // point from which the popup should open relative to the iconAnchor
           })          
           let markerCustom = L.marker([lat,lon], {icon:customIcon})
           let popupinfo = this.popUpService.makeObjectPopup(t);
           this.addIconImage(map, markerCustom, popupinfo, t.ID);
-          markerList.push(customIcon);
+          markerList.push(markerCustom);
         }   
         console.log('MarkerList: ' + markerList.length);
         map.addLayers(markerList)    
