@@ -100,11 +100,11 @@ def get_sensor():
    return get_sensor()
   
 
-@app.route('/object', methods = ['GET'])
+@app.route('/object', methods=['GET'])
 def get_object():
     args = request.args
     from object import get_object
-    return get_object(args.get("page", default=0), args.get("limit", default=5000))
+    return get_object()
 
 @app.route('/objects', methods = ['GET'])
 def get_object_id():

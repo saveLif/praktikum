@@ -25,6 +25,13 @@ services:
     environment:
       PYTHONPATH: /app/Rest-API
     command: gunicorn --bind 0.0.0.0:5000 Rest-API.api:app
+#
+#
+#
+#
+#
+#
+#
 #   influxdb:
 #     image: influxdb:2.7-alpine
 #     container_name: influxdb

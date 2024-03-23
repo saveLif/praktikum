@@ -77,10 +77,7 @@ geolocation:
 def get_object_id():
     id = request.args.get('ID')
 
-
-
-
-   
+  
     sql_select = """SELECT object.id, description, description_id, latitude, longitude FROM object INNER JOIN geolocation ON object.geolocation_id=geolocation.id WHERE object.ID = %s"""
 
     
@@ -123,16 +120,10 @@ geolocation:
 
 """ 
 
-def get_object(pageNumber = 0, lim = 5000):
-    
+def get_object():
+    sql_select = """SELECT obj.id, obj.description, obj.description_id, geo.latitude, geo.longitude 
+                    FROM object obj INNER JOIN geolocation geo ON obj.geolocation_id=geo.id ORDER BY obj.id ASC;"""
 
-     
-
-    startline = int(pageNumber) * int(lim);
-    sql_select = """SELECT obj.id, obj.description, obj.description_id, geo.latitude, geo.longitude FROM object obj INNER JOIN geolocation geo ON obj.geolocation_id=geo.id WHERE 
-    obj.id > """ + str(startline) + """ ORDER BY obj.id ASC limit """ + str(lim);
-
-    
     conn = get_connection()
     try:
         with conn:
@@ -142,11 +133,10 @@ def get_object(pageNumber = 0, lim = 5000):
     finally:
         conn.close()
 
-    
     objects = []
     for row in rows:
         objects.append({
-            "ID":row[0],
+            "ID": row[0],
             "description": row[1],
             "description_ID": row[2],
             "geolocation": {
@@ -156,31 +146,3 @@ def get_object(pageNumber = 0, lim = 5000):
         })
 
     return jsonify(objects)
-
-
-
-
-
-
-
-
-
-
-
-
-    
-
-
-
-
-
-            
-
-
-
-
-  
- 
-
-
-

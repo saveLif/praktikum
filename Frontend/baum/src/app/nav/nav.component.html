@@ -1,9 +1,9 @@
 <mat-toolbar>
   <button type="button" aria-label="Toggle sidenav" mat-icon-button (click)="drawer.toggle()"
     *ngIf="isHandset$ | async">
-    <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
+    <mat-icon aria-label="Side nav toggle icon">Menu</mat-icon>
   </button>
-  <span>pwa-aktuell</span>
+  <span>Die Grünflache</span>
 </mat-toolbar>
 
 <mat-sidenav-container class="sidenav-container">
@@ -13,31 +13,31 @@
     [opened]="(isHandset$ | async) === false">
 
     <a mat-button href="user" class="prof-button">
-      
-     
-
       <!--img alt="user" class="avatar mat-elevation-z8"
       src="https://assets.bigcartel.com/product_images/289916532/MONSTERA+IN+PROCESS_updown.jpg?auto=format&fit=max&w=1200" /-->
     <!--h4 class="name">Julian Meyer-Veit</h4-->
     <!--p class="designation">j.meyer-veit@ostfalia.de</p-->
     </a>
 
-
     <mat-divider></mat-divider>
 
-    <a mat-button href="" class="menu-button">
-      <mat-icon>home</mat-icon>
-      <span>Home</span>
+    <a mat-button href="anmeldung" class="menu-button">
+      <mat-icon>how_to_reg</mat-icon>
+      <span>Anmeldung</span>
     </a>
-    <a mat-button href="user" class="menu-button">
-      <mat-icon>person</mat-icon>
-      <span>Profile</span>
+    <a mat-button href="registrierung" class="menu-button">
+      <mat-icon>person_add</mat-icon>
+      <span>Registrierung</span>
     </a>
     <a mat-button href="map" class="menu-button">
       <mat-icon>map</mat-icon>
       <span>Sensoren</span>
     </a>
-    <a mat-button href="tree-science" class="menu-button">
+    <a mat-button href="list" class="menu-button">
+      <mat-icon>list</mat-icon>
+      <span>Liste</span>
+    </a>
+    <a mat-button href="baumkunde" class="menu-button">
       <mat-icon>nature</mat-icon>
       <span>Baumkunde</span>
     </a>

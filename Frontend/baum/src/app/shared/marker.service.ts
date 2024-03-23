@@ -17,26 +17,36 @@ export class MarkerService {
   ) {}
 
 
-  makeMarkers(map: L.Map | L.MarkerClusterGroup, path: string, t: any): void {
-    const user_id = localStorage.getItem('user_id');
-    console.log(user_id + " User id");
-    let lon = t.geolocation.longitude;
-    let lat = t.geolocation.latitude;
-    let customIcon = L.icon({
-      iconUrl: 'assets/tree-icon.png',
-      iconSize: [20, 20],      // size of the icon
-      iconAnchor: [16, 16],   // point of the icon which will correspond to marker's location
-      popupAnchor: [0, -16], // point from which the popup should open relative to the iconAnchor
-    })
-
-
-    let markerCustom = L.marker([lat,lon], {icon:customIcon})
-
-    console.log(t);
-    let popupinfo = this.popUpService.makeObjectPopup(t);
-    console.log(t.ID);
-    this.addIconImage(map, markerCustom, popupinfo, t.ID);
+  makeMarkers(map: L.Map | L.MarkerClusterGroup, objects: any[]): void {
+    // Delete existing markers from the map
+    if (map instanceof L.MarkerClusterGroup) {
+      map.clearLayers();
+    } else {
+      map.eachLayer((layer) => {
+        if (layer instanceof L.Marker) {
+          map.removeLayer(layer);
+        }
+      });
+    }
+  
+    // Add new markers using the objects provided
+    objects.forEach((obj) => {
+      // Create a marker for each object and add it to the map
+      const marker = L.marker([obj.geolocation.latitude, obj.geolocation.longitude]);
+  
+      // Add a popup to the marker with object details
+      marker.bindPopup(this.popUpService.makeObjectPopup(obj));
+  
+      // Add the marker directly to the cluster or map
+      if (map instanceof L.MarkerClusterGroup) {
+        map.addLayer(marker);
+      } else {
+        marker.addTo(map);
+      }
+    });
   }
+  
+  
   // Setzt für alle Objekte ein Marker in der Karte
   makeMarker(map: L.MarkerClusterGroup, path: string) {
 
@@ -73,7 +83,7 @@ export class MarkerService {
 
   addIconImage(map: L.Map | L.MarkerClusterGroup, markerCustom: any, popUpInfo: any, ID: any) {
     if (markerCustom !== undefined) {
-      markerCustom//marc
+      markerCustom
         .addTo(map)
         .bindPopup(popUpInfo)
         .on('popupopen', (a: any) => {
@@ -93,24 +103,24 @@ export class MarkerService {
   }
 
   // Erzeugt das Reservierungs Popup Fenster
-  addCircle(map: L.Map | L.MarkerClusterGroup, circle: any, popUpInfo: any, ID: any) {
-    if (circle!==null && circle !== undefined) {
-      circle//marc
-        .addTo(map)
-        .bindPopup(popUpInfo)
-        .on('popupopen', (a: any) => {
-          var popUp = a.target.getPopup();
-          console.log(popUp.getElement());
-          popUp
-            .getElement()
-            .querySelector('.open-btn')
-            .addEventListener('click', (_e: any) => {
-              localStorage.setItem('object_id', ID);
+  // addCircle(map: L.Map | L.MarkerClusterGroup, circle: any, popUpInfo: any, ID: any) {
+  //   if (circle!==null && circle !== undefined) {
+  //     circle
+  //       .addTo(map)
+  //       .bindPopup(popUpInfo)
+  //       .on('popupopen', (a: any) => {
+  //         var popUp = a.target.getPopup();
+  //         console.log(popUp.getElement());
+  //         popUp
+  //           .getElement()
+  //           .querySelector('.open-btn')
+  //           .addEventListener('click', (_e: any) => {
+  //             localStorage.setItem('object_id', ID);
 
-              console.log(ID);
-              this.router.navigate(['/tree/' + ID + '/green-game/reservierung']);
-            });
-        });
-    }
-  }
+  //             console.log(ID);
+  //             this.router.navigate(['/tree/' + ID + '/green-game/reservierung']);
+  //           });
+  //       });
+  //   }
+  // }
 }

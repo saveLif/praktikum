@@ -1,3 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stylized Buttons</title>
+  <style>
+    .pagination button {
+      background-color: #4CAF50;
+      border: none; 
+      color: white;   
+      padding: 8px 18px; 
+      text-align: center;
+      text-decoration: none; 
+      display: inline-block;
+      font-size: 11px;
+      margin: 8px;
+      cursor: pointer;
+      border-radius: 12px; 
+    }
+
+    .pagination button:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed; 
+    }
+
+    .pagination button:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+
 <div class="map-container">
   <div id="map"></div>
 </div>
+
+<div class="pagination">
+  <button (click)="prevPage()" [disabled]="pageNumber === 0">Zurück</button>
+  <!-- <button *ngFor="let pageNum of getPageNumbers()" (click)="goToPage(pageNumber)">{{ pageNumber }}</button> -->
+  <button (click)="nextPage()">Nächtste</button>
+</div>
+
+</body>
+</html>

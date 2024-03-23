@@ -15,10 +15,12 @@ export class ApiService {
 
   //Abfrage des Servers mit einem bestimmten Pfad
 
-  getGeoData(pfad: any, page: number , limit: number) {
-    return this._http
-      .get<any>(`http://localhost:5000/${pfad}?page=${page}&limit=${limit}`)
-      .pipe(catchError(this.handleError<any[]>('getData', [])));
+  getDataForPage(pageNumber: number, objectsPerPage: number): Observable<any> {
+    // Build your query URL with pagination parameters
+    const apiUrl = `http://localhost:5000/data?page=${pageNumber}&limit=${objectsPerPage}`;
+
+    // Make an HTTP GET request to your backend to retrieve data from the specified page
+    return this._http.get(apiUrl);
   }
 
   getData(pfad: any) {

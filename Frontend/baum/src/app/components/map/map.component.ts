@@ -30,6 +30,11 @@ export class MapComponent implements OnInit {
   private map!: L.Map;
   private markers!: L.MarkerClusterGroup;
 
+  public pageNumber = 0;
+  private limit = 10000;
+  private objects: any[] = [];
+  private allObjects: any[] = [];
+
   constructor(
     private markerService: MarkerService,
     private api: ApiService,
@@ -37,7 +42,63 @@ export class MapComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    console.log("start init map");
     this.initMap();
+    this.loadAllObjects();
+    
+  }
+
+  // Loads the objects from table geolocation.
+  loadAllObjects(): void{
+    const user_id = localStorage.getItem('user_id');
+    this.api.getData(`reminder/${user_id}`).subscribe((res) => {
+      this.api.getData('object').subscribe((object: any) => {
+        this.allObjects = object;
+        console.log("after call " + this.allObjects.length);
+        console.log("after call " + object.length);
+      });
+    });
+  }
+
+  loadObjectForPage(startindex: number) {
+    let objectPar: any[] = this.allObjects.slice(startindex, startindex + this.limit);
+
+    console.log(" in loadObjectForPage " + objectPar.length);
+    console.log(" in loadObjectForPage " + startindex);
+    if (objectPar != null){
+      console.log(" in loadObjectForPage " + objectPar.length);
+      this.makeMarkerToObjects(objectPar);
+    }
+  }
+
+  nextPage(): void {
+  const totalPages = Math.ceil(this.allObjects.length / this.limit);
+
+ if (this.pageNumber < totalPages - 1) {
+   console.log(" next page number " +   this.pageNumber);
+    this.loadObjectForPage(this.pageNumber * this.limit);
+    this.pageNumber++;
+ }
+}
+
+  prevPage(): void {
+    console.log("start previous  ");
+    if (this.pageNumber >= 1) {
+      console.log("actual page  " +  this.pageNumber--);
+      this.pageNumber--;
+      this.loadObjectForPage(this.pageNumber * this.limit);
+      console.log("Previous page    "  + this.pageNumber);
+    }
+  }
+
+  // goToPage(pageNumber: number): void {
+  //   if (pageNumber >= 1 && pageNumber <= this.totalPages) {
+  //     this.currentPage = pageNumber;
+  //     this.loadObjects();
+  //   }
+
+  getPageNumbers(): number[] {
+    return Array.from({ length: 10 }, (_, i) => i + 1);
   }
 
   private initMap(): void {
@@ -74,7 +135,7 @@ export class MapComponent implements OnInit {
 
     function updateProgressBar(processed: any, total: any, elapsed: any) {
 			if (elapsed > 1000) {
-				// if it takes more than a second to load, display the progress bar:
+
         if (progress != null && progressBar != null){
           console.log(  +  "   into updateProgressBar 1 ")
 				  progress.style.display = 'block';
@@ -83,7 +144,7 @@ export class MapComponent implements OnInit {
 			}
 
 			if (processed === total) {
-				// all markers processed - hide the progress bar:
+
         if (progress != null)
         {
           console.log(  +  "   into updateProgressBar 2 ")
@@ -107,11 +168,15 @@ export class MapComponent implements OnInit {
         });
       },
       }
-      
-      );
+    );  
 
+  }
+
+   private makeMarkerToObjects(objectsToMark: any[]){
+
+   
     console.log('start creating markers: ' + window.performance.now());
-    this.markerService.makeMarker(this.markers, 'object');
+    this.markerService.makeMarkers(this.markers, objectsToMark);
     console.log('end creating markers: ' + window.performance.now());
 
     this.map.addLayer(this.markers);
