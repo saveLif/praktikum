@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import * as L from 'leaflet';
 import { MarkerService } from '../../shared/marker.service';
 import { GpsService } from '../../shared/gps.service';
@@ -25,6 +25,7 @@ L.Marker.prototype.options.icon = iconDefault;
   selector: 'app-map',
   templateUrl: './map.component.html',
   styleUrls: ['./map.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MapComponent implements OnInit {
   private map!: L.Map;
@@ -43,18 +44,14 @@ export class MapComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    console.log("start init map");
     this.initMap();
     this.loadAllObjects();
-  }
+    }
   
   loadObjectForPage(pageNumber: number) {
     const startindex = pageNumber * this.limit;
     const endindex = (pageNumber + 1) * this.limit;
     const objectsToMark = this.allObjects.slice(startindex, endindex);
-  
-    console.log(" in loadObjectForPage " + objectsToMark.length);
-    console.log(" in loadObjectForPage " + startindex);
     if (objectsToMark.length > 0){
       console.log(" in loadObjectForPage " + objectsToMark.length);
       this.makeMarkerToObjects(objectsToMark);
@@ -64,6 +61,7 @@ export class MapComponent implements OnInit {
   nextPage(): void {
     const totalPages = Math.ceil(this.allObjects.length / this.limit);
   
+    console.log("Number total of pages in next pages," + totalPages);
     if (this.pageNumber < totalPages - 1) {
       console.log(" next page number: " + this.pageNumber);
       this.pageNumber++;
@@ -74,10 +72,8 @@ export class MapComponent implements OnInit {
   prevPage(): void {
     console.log("start previous  ");
     if (this.pageNumber >= 1) {
-      console.log("actual page  "  +  this.pageNumber);
       this.pageNumber--;
       this.loadObjectForPage(this.pageNumber);
-      console.log("Previous page: "  + this.pageNumber);
     }
   }
   
@@ -88,7 +84,6 @@ export class MapComponent implements OnInit {
     }
   }
   
-
   // Loads the objects from table geolocation.
   loadAllObjects(): void{
     const user_id = localStorage.getItem('user_id');
@@ -97,16 +92,10 @@ export class MapComponent implements OnInit {
         this.allObjects = object;
         this.totalPages = Math.ceil(this.allObjects.length / this.limit);
         this.loadObjectForPage(0);
-        console.log("after call " + this.allObjects.length);
-        console.log("after call " + object.length);
       });
     });
-  }
 
-
-
-
-    
+  }  
 
 
   getPageNumbers(): number[] {
@@ -116,7 +105,7 @@ export class MapComponent implements OnInit {
   private initMap(): void {
     this.map = L.map('map', {
       center: [52.2646577, 10.5236066],
-      zoom: 12,
+      zoom: 12
     });
 
     const OSM = L.tileLayer(
@@ -142,28 +131,9 @@ export class MapComponent implements OnInit {
 
     CartoDB_Voyager.addTo(this.map);
 
-    let progress = document.getElementById('progress');
-    let progressBar = document.getElementById('progress-bar');
-
-    function updateProgressBar(processed: any, total: any, elapsed: any) {
-      if (elapsed > 1000) {
-        if (progress != null && progressBar != null){
-          console.log("   into updateProgressBar 1 ")
-          progress.style.display = 'block';
-          progressBar.style.width = Math.round(processed/total*100) + '%';
-        }
-      }
-
-      if (processed === total) {
-        if (progress != null) {
-          console.log("   into updateProgressBar 2 ")
-          progress.style.display = 'none';
-        }
-      }
-    }
     this.markers = L.markerClusterGroup({
       chunkedLoading: true,
-      chunkProgress: updateProgressBar,
+      chunkInterval: 1,
       iconCreateFunction: (cluster) => {
         const count = cluster.getChildCount();
         const treeIconUrl = 'assets/arbre-icon.png';
@@ -179,12 +149,9 @@ export class MapComponent implements OnInit {
 
   private makeMarkerToObjects(objectsToMark: any[]){
     console.log('start creating markers: ' + window.performance.now());
-    this.markerService.makeMarkers(this.markers, objectsToMark);
+    this.markerService.makeMarkerForObjects(this.markers, objectsToMark);
     console.log('end creating markers: ' + window.performance.now());
-
     this.map.addLayer(this.markers);
-    console.log('end clustering: ' + window.performance.now());
-    
     this.userGPS.getUserLocation(this.map);
   }
 }

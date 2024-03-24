@@ -46,28 +46,26 @@ export class MarkerService {
     });
   }
   
-  
-  // Setzt für alle Objekte ein Marker in der Karte
-  makeMarker(map: L.MarkerClusterGroup, path: string) {
+   // Setzt für alle Objekte ein Marker in der Karte
+   makeMarkerForObjects(map: L.MarkerClusterGroup, objects: any[]) {
 
+    map.clearLayers();
+    const customIcon = L.icon({
+      iconUrl: 'assets/arbre-icon.png',
+      iconSize: [20, 20],
+      iconAnchor: [16, 16],
+      popupAnchor: [0, -16],
+    });
     const user_id = localStorage.getItem('user_id');
-    this.api.getData(`reminder/${user_id}`).subscribe((res) => {
-      this.api.getData(path).subscribe((object: any) => {
         
       let markerList: any[] = [];
         let now = new Date();
 
         let timer = 0;
         // sucht Objekte nach Reservierungen falls reserviert ist der Rand rot sonst schwarz
-        for (const t of object) {    
+        for (const t of objects) {    
           let lon = t.geolocation.longitude;
-          let lat = t.geolocation.latitude;
-          let customIcon = L.icon({
-            iconUrl: 'assets/arbre-icon.png',
-            iconSize: [20, 20],      // size of the icon
-            iconAnchor: [16, 16],    // point of the icon which will correspond to marker's location
-            popupAnchor: [0, -16],   // point from which the popup should open relative to the iconAnchor
-          })          
+          let lat = t.geolocation.latitude;      
           let markerCustom = L.marker([lat,lon], {icon:customIcon})
           let popupinfo = this.popUpService.makeObjectPopup(t);
           this.addIconImage(map, markerCustom, popupinfo, t.ID);
@@ -75,10 +73,43 @@ export class MarkerService {
         }   
         console.log('MarkerList: ' + markerList.length);
         map.addLayers(markerList)    
+      
+}
+ 
+  
+  // Setzt für alle Objekte ein Marker in der Karte
+  makeMarker(map: L.MarkerClusterGroup, path: string) {
+
+    map.clearLayers();
+
+    
+    const customIcon = L.icon({
+      iconUrl: 'assets/arbre-icon.png',
+      iconSize: [20, 20],
+      iconAnchor: [16, 16],
+      popupAnchor: [0, -16],
+    });
+    
+    const user_id = localStorage.getItem('user_id');
+    this.api.getData(`reminder/${user_id}`).subscribe((res) => {
+      this.api.getData(path).subscribe((object: any) => {
+        
+      let markerList: any[] = [];
+        // sucht Objekte nach Reservierungen falls reserviert ist der Rand rot sonst schwarz
+        for (const t of object) {    
+          let lon = t.geolocation.longitude;
+          let lat = t.geolocation.latitude;         
+          let markerCustom = L.marker([lat,lon], {icon:customIcon})
+          let popupinfo = this.popUpService.makeObjectPopup(t);
+          this.addIconImage(map, markerCustom, popupinfo, t.ID);
+          markerList.push(markerCustom);
+        }   
+        map.addLayers(markerList)    
       });
     });
 }
  
+
 
 
   addIconImage(map: L.Map | L.MarkerClusterGroup, markerCustom: any, popUpInfo: any, ID: any) {
@@ -88,7 +119,6 @@ export class MarkerService {
         .bindPopup(popUpInfo)
         .on('popupopen', (a: any) => {
           var popUp = a.target.getPopup();
-          console.log(popUp.getElement());
           popUp
             .getElement()
             .querySelector('.open-btn')
